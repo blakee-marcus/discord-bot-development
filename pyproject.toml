@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "discord-bot-development"
+version = "0.1.0"
+description = "Source-backed Discord bot engineering skill and deterministic code auditor"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "Blake Marcus" }
+]
+dependencies = []
+
+[project.urls]
+Documentation = "https://github.com/blakee-marcus/discord-bot-development#readme"
+Issues = "https://github.com/blakee-marcus/discord-bot-development/issues"
+Source = "https://github.com/blakee-marcus/discord-bot-development"
+
+[project.scripts]
+discord-doctor = "discord_bot_development.doctor:main"
+
+[project.optional-dependencies]
+dev = [
+  "build",
+  "pytest",
+  "ruff",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/discord_bot_development"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F"]
+ignore = []

@@ -40,6 +40,21 @@ SKILL_REQUIRED_FILES = [
     "references/official-sources.md",
 ]
 
+REQUIRED_FILES = [
+    "pyproject.toml",
+    "src/discord_bot_development/__init__.py",
+    "src/discord_bot_development/doctor.py",
+    "src/discord_bot_development/__main__.py",
+    "README.md",
+    "LICENSE",
+    "SKILL.md",
+    ".claude-plugin/plugin.json",
+    "scripts/discord_doctor.py",
+    "scripts/verify_public_surface.py",
+    "tests/test_checker.py",
+    "tests/test_cli.py",
+]
+
 
 def verify_no_hardcoded_tokens() -> list[str]:
     """Scan repo for hardcoded tokens in non-fixture files."""
@@ -136,6 +151,34 @@ def verify_references_exist() -> list[str]:
     return missing
 
 
+def verify_required_files() -> list[str]:
+    """Verify all required files exist."""
+    missing = []
+    for f in REQUIRED_FILES:
+        if not (REPO_ROOT / f).exists():
+            missing.append(f)
+    return missing
+
+
+def verify_entry_point() -> list[str]:
+    """Verify pyproject.toml has the console entry point."""
+    pp_path = REPO_ROOT / "pyproject.toml"
+    if not pp_path.exists():
+        return ["pyproject.toml missing"]
+
+    try:
+        content = pp_path.read_text(encoding="utf-8")
+    except OSError as e:
+        return [f"Cannot read pyproject.toml: {e}"]
+
+    if "discord-doctor" not in content:
+        return ["pyproject.toml missing 'discord-doctor' entry point"]
+    if "discord_bot_development.doctor:main" not in content:
+        return ["pyproject.toml missing entry point target"]
+
+    return []
+
+
 def main() -> int:
     all_issues: dict[str, list[str]] = {}
 
@@ -155,6 +198,14 @@ def main() -> int:
     if issues:
         all_issues["missing_references"] = issues
 
+    issues = verify_required_files()
+    if issues:
+        all_issues["missing_required_files"] = issues
+
+    issues = verify_entry_point()
+    if issues:
+        all_issues["entry_point"] = issues
+
     if all_issues:
         print("FAIL: Issues found")
         for check, issues in all_issues.items():
@@ -167,6 +218,8 @@ def main() -> int:
     print("PASS: SKILL.md frontmatter")
     print("PASS: Plugin manifest")
     print("PASS: References exist")
+    print("PASS: Required files exist")
+    print("PASS: Entry point defined")
     print("\nAll checks passed")
     return 0
 
