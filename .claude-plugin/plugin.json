@@ -2,7 +2,7 @@
     "name": "discord-bot-development",
     "description": "Build production-quality Discord bots correctly. Framework-aware (discord.js 14.27, discord.py 2.7) but fundamentals-first.",
     "version": "0.1.0",
-    "author": "Blake Marcus, Hermes Agent",
+    "author": "Blake Marcus",
     "license": "MIT",
     "homepage": "https://github.com/blakee-marcus/discord-bot-development",
     "skills": [

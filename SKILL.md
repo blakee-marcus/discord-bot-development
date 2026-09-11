@@ -2,7 +2,7 @@
 name: discord-bot-development
 description: "Build production-quality Discord bots correctly. Framework-aware (discord.js 14.27, discord.py 2.7) but fundamentals-first: application setup, Gateway intents, interactions/slash commands, permissions, rate limits, OAuth2, security, sharding, testing, and deployment."
 version: 0.1.0
-author: Blake Marcus, Hermes Agent
+author: Blake Marcus
 license: MIT
 homepage: https://github.com/blakee-marcus/discord-bot-development
 platforms: [linux, macos, windows]
