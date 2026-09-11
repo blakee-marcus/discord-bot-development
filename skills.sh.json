@@ -1,0 +1,11 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Discord Bot Development",
+      "description": "Framework-aware agent skill for building production-quality Discord bots. Detect→classify→design→implement→verify workflow with deterministic checker.",
+      "skills": ["discord-bot-development"]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+
+    - name: Run tests
+      run: |
+        pytest tests/ -v
+
+    - name: Run checker on fixtures
+      run: |
+        echo "=== Checking broken fixtures (expect failures) ==="
+        python scripts/discord_doctor.py tests/fixtures/js_broken || true
+        python scripts/discord_doctor.py tests/fixtures/python_broken || true
+        echo "=== Checking ok fixtures (expect pass) ==="
+        python scripts/discord_doctor.py tests/fixtures/js_ok
+        python scripts/discord_doctor.py tests/fixtures/python_ok
+
+    - name: Run public surface check
+      run: |
+        python scripts/verify_public_surface.py
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Lint checker
+      run: |
+        pip install ruff
+        ruff check scripts/
