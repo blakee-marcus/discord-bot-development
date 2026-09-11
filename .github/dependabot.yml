@@ -1,0 +1,12 @@
+# A dependency update tool is not yet configured for this project.
+# Weekly checks are sufficient for now.
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

@@ -2,16 +2,13 @@
 
 ## Reporting Security Issues
 
-If you discover a security vulnerability in this repository, please report it
-privately by opening a **security advisory** on GitHub.
+If you discover a security vulnerability in this repository, please report it privately by opening a **security advisory** on GitHub.
 
 **Do not** open public issues for security vulnerabilities.
 
 ## What This Is
 
-This repository is an Agent Skill — documentation and a deterministic checker
-for Discord bot development. It ships **no bot runtime**, no credentials, and
-makes no network calls.
+This repository is an Agent Skill — documentation and a deterministic checker for Discord bot development. It ships **no bot runtime**, no credentials, and makes no network calls.
 
 ## What This Is NOT
 
@@ -23,7 +20,8 @@ makes no network calls.
 
 The repository contains:
 - Documentation (`.md` files)
-- Checker script (`scripts/discord_doctor.py`)
+- Installable Python package (`src/discord_bot_development/`)
+- Backward-compatible wrapper (`scripts/discord_doctor.py`)
 - Tests (no live tokens, no network)
 - CI workflow
 
