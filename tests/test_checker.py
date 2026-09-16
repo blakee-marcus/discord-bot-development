@@ -5,14 +5,9 @@ Each fixture tests one or more rules with positive (should trigger) and
 negative (should not trigger) examples.
 """
 
-import sys
 from pathlib import Path
 
-# Add scripts to path BEFORE importing discord_doctor
-# From tests/test_checker.py, scripts/ is at ../scripts
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-
-from discord_doctor import (
+from discord_bot_development.doctor import (
     CheckResult,
     check_path,
 )
@@ -135,4 +130,6 @@ def test_checker_on_ok_fixtures_dir() -> None:
     fixture_dir = Path(__file__).parent / "fixtures" / "js_ok"
     result = CheckResult()
     check_path(fixture_dir, result)
-    assert result.passed, f"Expected PASS on ok fixtures, got: {[f.rule_id for f in result.findings]}"
+    assert result.passed, (
+        f"Expected PASS on ok fixtures, got: {[f.rule_id for f in result.findings]}"
+    )

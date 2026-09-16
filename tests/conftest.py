@@ -1,5 +1,6 @@
-import sys
+"""Test fixtures for the discord-bot-development checker."""
+
 from pathlib import Path
 
-# Add project root to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Fixture base path — used by tests to locate fixture files
+FIXTURES_DIR = Path(__file__).parent / "fixtures"

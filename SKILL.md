@@ -160,9 +160,16 @@ discord.py pre-2.0 patterns are legacy — avoid.
 ## Checker
 
 ```bash
-python scripts/discord_doctor.py <path-to-bot>           # PASS/WARN/FAIL report
-python scripts/discord_doctor.py <path> --json          # machine-readable
-python scripts/discord_doctor.py <path> --rules         # list rule IDs
+discord-doctor <path-to-bot>           # PASS/WARN/FAIL report
+discord-doctor <path> --json          # machine-readable
+discord-doctor --rules               # list rule IDs
+discord-doctor --version             # show version
+```
+
+Legacy invocation still works via the compatibility wrapper:
+
+```bash
+python scripts/discord_doctor.py <path-to-bot>
 ```
 
 Run `pytest tests/` for the full test suite, including checker fixture tests.

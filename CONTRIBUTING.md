@@ -1,7 +1,6 @@
 # Contributing to Discord Bot Development
 
-Thank you for your interest in contributing! This repository is an Agent Skill
-that teaches production-quality Discord bot development.
+Thank you for your interest in contributing! This repository is both an agent skill and a deterministic Discord bot code auditor.
 
 ## How to Contribute
 
@@ -20,10 +19,12 @@ If you find errors in the documentation, checker rules, or examples:
 1. Fork the repository.
 2. Create a feature branch (`git checkout -b fix/your-fix`).
 3. Make your changes.
-4. Run the test suite: `pytest tests/`
-5. Run the checker on fixtures: `python scripts/discord_doctor.py tests/fixtures/`
-6. Commit with a clear message.
-7. Push and open a pull request.
+4. Install dev dependencies: `python -m pip install -e ".[dev]"`
+5. Run the test suite: `pytest`
+6. Run the linter: `ruff check .`
+7. Run the checker on fixtures: `discord-doctor tests/fixtures/`
+8. Commit with a clear message.
+9. Push and open a pull request.
 
 ### Documentation Style
 
@@ -34,9 +35,19 @@ If you find errors in the documentation, checker rules, or examples:
 
 ### Code Style
 
-- Python: PEP 8, type hints where helpful.
+- Python: PEP 8, type hints where helpful, line length 100.
 - JavaScript/TypeScript: Standard JS style.
 - Tests: pytest for Python, Jest/Vitest for JS (if applicable).
+
+### Development Setup
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install -e ".[dev]"
+pytest
+ruff check .
+```
 
 ## Code of Conduct
 

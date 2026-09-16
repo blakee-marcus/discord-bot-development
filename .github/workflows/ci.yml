@@ -2,58 +2,69 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        os: [ubuntu-latest]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        include:
+          - os: windows-latest
+            python-version: '3.12'
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
 
-    - name: Run tests
-      run: |
-        pytest tests/ -v
+      - name: Lint
+        run: ruff check .
 
-    - name: Run checker on fixtures
-      run: |
-        echo "=== Checking broken fixtures (expect failures) ==="
-        python scripts/discord_doctor.py tests/fixtures/js_broken || true
-        python scripts/discord_doctor.py tests/fixtures/python_broken || true
-        echo "=== Checking ok fixtures (expect pass) ==="
-        python scripts/discord_doctor.py tests/fixtures/js_ok
-        python scripts/discord_doctor.py tests/fixtures/python_ok
+      - name: Run tests
+        run: pytest -q
 
-    - name: Run public surface check
-      run: |
-        python scripts/verify_public_surface.py
+      - name: Run public surface check
+        run: python scripts/verify_public_surface.py
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+      - name: Build package
+        run: python -m build
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Smoke test built wheel
+        run: |
+          python -m venv /tmp/smoke-env
+          /tmp/smoke-env/bin/pip install dist/*.whl
+          /tmp/smoke-env/bin/discord-doctor --help
+          /tmp/smoke-env/bin/discord-doctor --rules
+        shell: bash
 
-    - name: Lint checker
-      run: |
-        pip install ruff
-        ruff check scripts/
+      - name: CLI sanity checks
+        run: |
+          echo "=== Checking broken fixtures (expect failures) ==="
+          if discord-doctor tests/fixtures/js_broken; then
+            echo "Expected js_broken to fail"
+            exit 1
+          fi
+          if discord-doctor tests/fixtures/python_broken; then
+            echo "Expected python_broken to fail"
+            exit 1
+          fi
+          echo "=== Checking ok fixtures (expect pass) ==="
+          discord-doctor tests/fixtures/js_ok
+          discord-doctor tests/fixtures/python_ok
+        shell: bash

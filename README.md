@@ -1,84 +1,149 @@
-# Discord Bot Development — Agent Skill
+# Discord Bot Development
 
-A source-backed agent skill for building **production-quality Discord bots**.
-It teaches Discord platform fundamentals first, then provides stable
-playbooks for discord.js and discord.py.
+[![CI](https://github.com/blakee-marcus/discord-bot-development/actions/workflows/ci.yml/badge.svg)](https://github.com/blakee-marcus/discord-bot-development/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Author:** Blake Marcus, Hermes Agent
+> Production-oriented Discord engineering guidance plus a deterministic auditor for common Discord bot mistakes.
+
+**Author:** Blake Marcus
 **License:** MIT
-**Version:** 0.1.0
 
-## Install
+## What It Is
+
+This repository has two public surfaces:
+
+1. **Agent skill** — `SKILL.md` + `references/` teach Discord platform fundamentals and stable patterns for discord.js 14.27 and discord.py 2.7.
+2. **Deterministic developer tool** — `discord-doctor` CLI audits bot code for the mistakes LLMs repeatedly make: hardcoded tokens, missing intents, registration inside `ready`, unbounded collectors, legacy APIs.
+
+## Features
+
+- **14 deterministic rules** — high-confidence static analysis for JS/TS/Python Discord code
+- **Machine-readable output** — `--json` for CI consumption
+- **Agent skill** — source-backed references for building production-quality bots
+- **Cross-platform CI** — tested on Ubuntu + Windows, Python 3.10–3.13
+
+## Installation
+
+### As a tool
 
 ```bash
 git clone https://github.com/blakee-marcus/discord-bot-development.git
+cd discord-bot-development
+python -m pip install -e .
+discord-doctor /path/to/your/bot
 ```
 
-This repository is documentation + a deterministic checker. It ships no bot
-runtime. To use it as a Hermes Agent skill, point Hermes at the `SKILL.md`.
+### As an agent skill
 
-## What's Inside
+Point your agent at `SKILL.md`. The skill entry point, references, and plugin manifest are all at the repository root.
 
-- `SKILL.md` — the skill entry point with a detect→classify→design→implement→verify workflow
-- `references/` — canonical, non-duplicated reference pages for each topic
-- `scripts/discord_doctor.py` — deterministic checker (PASS/WARN/FAIL)
-- `tests/` — checker fixtures and public-surface verification
-
-## Usage
+## Quick Start
 
 ```bash
-# Run the checker
-python scripts/discord_doctor.py <path-to-bot>
+# Check a bot directory
+discord-doctor ./my-bot
 
-# JSON output
-python scripts/discord_doctor.py <path-to-bot> --json
+# JSON output for CI
+discord-doctor ./my-bot --json > findings.json
 
-# List rules
-python scripts/discord_doctor.py <path-to-bot> --rules
+# List all rule IDs
+discord-doctor --rules
 
-# Run tests
-pytest tests/
+# Check version
+discord-doctor --version
 ```
 
-## Why
+## Discord Doctor
 
-LLMs repeatedly make the same mistakes when generating Discord bots: hardcoded
-tokens, missing intents, registration inside `ready`, unbounded collectors,
-legacy APIs. This skill teaches the current stable patterns and audits code
-for the known-failure modes.
+The `discord-doctor` CLI is a deterministic static-analysis tool for Discord bot code.
 
-## Coverage
+### Exit codes
 
-| Topic | Reference |
-|-------|-----------|
-| Application setup | `references/application-setup.md` |
-| Interactions & commands | `references/interactions-and-commands.md` |
-| Gateway & intents | `references/gateway-and-intents.md` |
-| Permissions & OAuth2 | `references/permissions-and-oauth2.md` |
-| Rate limits | `references/rate-limits.md` |
-| Security & policy | `references/security-and-policy.md` |
-| Sharding & operations | `references/sharding-and-operations.md` |
-| Testing & deployment | `references/testing-and-deployment.md` |
-| discord.js 14.27 | `references/discord-js.md` |
-| discord.py 2.7 | `references/discord-py.md` |
-| Official sources | `references/official-sources.md` |
+| Code | Meaning |
+|------|---------|
+| 0 | Scan completed, no FAIL findings |
+| 1 | Scan completed, FAIL findings present |
+| 2 | Invalid invocation / target not found |
 
-## Verified Runtime Claims
+### Rules
 
-This skill makes the following **verified** runtime compatibility claims:
+| ID | Severity | Description |
+|----|----------|-------------|
+| DB001 | FAIL | Hardcoded bot token detected |
+| DB002 | FAIL | Legacy discord.js v12/v13 API usage |
+| DB003 | FAIL | Command registration inside ready/on_ready handler |
+| DB004 | WARN | Client/Bot constructed without explicit intents |
+| DB005 | WARN | Collector/modal await without timeout |
+| DB006 | FAIL | Deprecated response method |
+| DB007 | WARN | Deprecated DM option or method |
+| DB008 | FAIL | Python file/package shadows 'discord' |
+| DB009 | FAIL | time.sleep() used in async context |
+| DB010 | WARN | tree.sync() called from on_ready |
+| DB011 | FAIL | Literal token passed to run/start/login |
+| DB012 | WARN | Bot() without intents parameter |
+| DB013 | WARN | Multiple response calls without is_done() guard |
+| DB014 | WARN | Response call after defer without followup |
 
-- discord.js 14.27.0 — stable, Node >=18 (package) / >=22.12.0 (guide)
-- discord.py 2.7.1 — stable, Python >=3.8
+## Agent Skill
 
-These are **snapshots** and drift-sensitive. Always check current versions.
+The `SKILL.md` and `references/` directory form a complete agent skill for Discord bot development:
+
+- **detect** → framework, version, intents, permissions, scope
+- **classify** → new bot / add feature / migrate / audit / debug
+- **design** → interaction type, registration path, intent set, permission bitmap
+- **implement** → follow framework reference, REST-only registration, ACK/defer within 3s
+- **verify** → run the checker, lint, typecheck, test matrix
+
+## Supported Frameworks
+
+| Framework | Version | Runtime |
+|-----------|---------|---------|
+| discord.js | 14.27.0 | Node >=18 (package); >=22.12.0 recommended |
+| discord.py | 2.7.1 | Python >=3.8 |
+
+## Project Structure
+
+```text
+discord-bot-development/
+├── .claude-plugin/          # Plugin manifest
+├── .github/                 # CI workflow + dependabot
+├── references/              # Canonical reference pages
+├── scripts/
+│   ├── discord_doctor.py    # Backward-compatible wrapper
+│   └── verify_public_surface.py
+├── src/
+│   └── discord_bot_development/
+│       ├── __init__.py      # Public API exports
+│       ├── __main__.py      # Module invocation
+│       └── doctor.py        # Checker implementation
+├── tests/
+│   ├── fixtures/            # Positive + negative test fixtures
+│   ├── test_checker.py      # Library API tests
+│   └── test_cli.py          # CLI surface tests
+├── pyproject.toml           # Package metadata + build config
+├── SKILL.md                 # Agent skill entry point
+└── skills.sh.json           # Skill loader manifest
+```
+
+## Development
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[dev]"
+pytest
+ruff check .
+python -m build
+```
+
+## Security
+
+See [SECURITY.md](SECURITY.md). The checker rejects hardcoded tokens (DB001). The repository ships no bot runtime, no credentials, and makes no network calls.
 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Security
-
-See [SECURITY.md](SECURITY.md).
 
 ## License
 
